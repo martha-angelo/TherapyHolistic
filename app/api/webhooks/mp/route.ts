@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const { type, data } = body
 
     if (type === 'payment' && data?.id) {
-      // Fetch payment from MP
+      // Busca o pagamento no Mercado Pago
       const mpRes = await fetch(`https://api.mercadopago.com/v1/payments/${data.id}`, {
         headers: { Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}` },
       })
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
           data: { status: 'paid', paymentId: String(data.id) },
         })
 
-        // Send confirmation email
+        // Envia email de confirmação com o meetLink salvo no booking
         await sendBookingConfirmation({
           name: booking.name,
           email: booking.email,
@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
           timeSlot: booking.timeSlot,
           duration: booking.duration,
           price: booking.price,
+          meetLink: booking.meetLink ?? undefined,
         }).catch(console.error)
       }
     }

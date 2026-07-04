@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendBookingConfirmation } from '@/lib/email'
+import { createMeetForSession } from '@/lib/google-meet'
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Campos obrigatórios faltando' }, { status: 400 })
     }
 
-    // Check if slot is already taken
+    // Verifica se o horário já está reservado
     const existing = await prisma.booking.findFirst({
       where: { date, timeSlot, status: { in: ['pending', 'confirmed', 'paid'] } },
     })
@@ -21,12 +22,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Este horário já foi reservado. Escolha outro.' }, { status: 409 })
     }
 
-    // Create booking
+    // Tenta criar link único do Google Meet (falha silenciosamente se não configurado)
+    const meetData = await createMeetForSession({
+      patientName: name,
+      patientEmail: email,
+      date,
+      timeSlot,
+      duration,
+    }).catch(() => null)
+
+    // Cria o agendamento
     const booking = await prisma.booking.create({
-      data: { name, email, phone, date, timeSlot, duration, price, notes, status: 'pending' },
+      data: {
+        name, email, phone, date, timeSlot, duration, price, notes,
+        status: 'pending',
+        meetLink: meetData?.meetLink ?? null,
+        calEventId: meetData?.calEventId ?? null,
+      },
     })
 
-    // Try Mercado Pago
+    // Tenta integrar Mercado Pago
     if (process.env.MP_ACCESS_TOKEN && process.env.MP_ACCESS_TOKEN !== 'TEST-xxxx') {
       try {
         const mpRes = await fetch('https://api.mercadopago.com/checkout/preferences', {
@@ -61,9 +76,12 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Fallback: no MP configured — confirm directly and send email
+    // Fallback: sem MP configurado — confirma direto e envia email
     await prisma.booking.update({ where: { id: booking.id }, data: { status: 'confirmed' } })
-    await sendBookingConfirmation({ name, email, date, timeSlot, duration, price }).catch(console.error)
+    await sendBookingConfirmation({
+      name, email, date, timeSlot, duration, price,
+      meetLink: booking.meetLink ?? undefined,
+    }).catch(console.error)
 
     return NextResponse.json({ success: true, bookingId: booking.id })
   } catch (e) {
@@ -73,7 +91,6 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  // Admin only — checked via simple secret or auth in real usage
   const bookings = await prisma.booking.findMany({
     orderBy: { createdAt: 'desc' },
   })

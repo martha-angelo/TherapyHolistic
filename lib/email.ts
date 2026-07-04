@@ -7,6 +7,7 @@ interface BookingEmailData {
   timeSlot: string
   duration: number
   price: number
+  meetLink?: string  // link único gerado por sessão (Google Meet) ou fallback do env
 }
 
 export async function sendBookingConfirmation(data: BookingEmailData) {
@@ -18,12 +19,15 @@ export async function sendBookingConfirmation(data: BookingEmailData) {
   // Lazy init — só cria o cliente quando a key existe (evita erro no build do Vercel)
   const resend = new Resend(process.env.RESEND_API_KEY)
 
+  // Link do Meet: prioriza o link único gerado, fallback para o env fixo
+  const meetLink = data.meetLink || process.env.SESSION_MEET_LINK || ''
+
   const dateFormatted = new Intl.DateTimeFormat('pt-BR', {
     weekday: 'long',
     day: '2-digit',
     month: 'long',
     year: 'numeric',
-  }).format(new Date(data.date))
+  }).format(new Date(data.date + 'T12:00:00'))
 
   await resend.emails.send({
     from: process.env.RESEND_FROM || 'Martha Angelo <noreply@marthaangelo.com.br>',
@@ -50,16 +54,17 @@ export async function sendBookingConfirmation(data: BookingEmailData) {
             <p style="margin: 4px 0; color: #1F4034;"><strong>Valor:</strong> R$ ${data.price.toFixed(2)}</p>
           </div>
 
-          ${process.env.SESSION_MEET_LINK ? `
+          ${meetLink ? `
           <div style="background: #1D9E75; border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; text-align: center;">
             <p style="color: #fff; font-size: 14px; margin: 0 0 10px;">🎥 Link da sua sessão online</p>
-            <a href="${process.env.SESSION_MEET_LINK}" style="color: #fff; font-weight: bold; font-size: 15px; word-break: break-all;">${process.env.SESSION_MEET_LINK}</a>
+            <a href="${meetLink}" style="color: #fff; font-weight: bold; font-size: 15px; word-break: break-all;">${meetLink}</a>
           </div>
           ` : `
           <p style="color: #444; line-height: 1.7; margin: 0 0 16px;">
             Você receberá o link da sessão online por WhatsApp até 30 minutos antes do horário marcado.
           </p>
           `}
+
           <p style="color: #444; line-height: 1.7; margin: 0;">
             Qualquer dúvida, me chame no Instagram <a href="https://instagram.com/marthaangeloo" style="color: #2E5D4B;">@marthaangeloo</a>.
           </p>
