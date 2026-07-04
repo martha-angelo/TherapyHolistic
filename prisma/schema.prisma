@@ -44,6 +44,8 @@ model Booking {
   status      String   @default("pending") // pending | confirmed | cancelled | paid
   paymentId   String?
   notes       String?
+  meetLink    String?  // Link único do Google Meet gerado por sessão
+  calEventId  String?  // ID do evento no Google Calendar
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
