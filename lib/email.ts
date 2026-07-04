@@ -1,7 +1,5 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 interface BookingEmailData {
   name: string
   email: string
@@ -16,6 +14,9 @@ export async function sendBookingConfirmation(data: BookingEmailData) {
     console.log('⚠️  RESEND_API_KEY não configurada — email não enviado')
     return
   }
+
+  // Lazy init — só cria o cliente quando a key existe (evita erro no build do Vercel)
+  const resend = new Resend(process.env.RESEND_API_KEY)
 
   const dateFormatted = new Intl.DateTimeFormat('pt-BR', {
     weekday: 'long',
