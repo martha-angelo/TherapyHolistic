@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String
+  imageUrl    String?
+  category    String   @default("reflexoes")
+  published   Boolean  @default(false)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Availability {
+  id        String   @id @default(cuid())
+  date      String   // YYYY-MM-DD
+  timeSlot  String   // HH:MM
+  blocked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@unique([date, timeSlot])
+}
+
+model Booking {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  date        String   // YYYY-MM-DD
+  timeSlot    String   // HH:MM
+  duration    Int      // 30 ou 60
+  price       Float
+  status      String   @default("pending") // pending | confirmed | cancelled | paid
+  paymentId   String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  initials  String
+  text      String
+  stars     Int      @default(5)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  key   String @id
+  value String
+}
+
+model Patient {
+  id        String        @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  birthDate String?       // YYYY-MM-DD (opcional)
+  notes     String?       // Observações gerais sobre o paciente
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  sessions  SessionNote[]
+}
+
+model SessionNote {
+  id          String   @id @default(cuid())
+  patientId   String
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  sessionDate String   // YYYY-MM-DD
+  whatWasDone String   // O que foi trabalhado/feito na sessão
+  nextPlan    String?  // Plano / intenção para a próxima sessão
+  mood        String?  // Estado emocional observado (ex: ansiosa, aberta, resistente)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
