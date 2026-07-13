@@ -150,14 +150,15 @@ export default async function HomePage() {
             <div className="relative">
               {/* Background blob */}
               <div className="absolute -inset-4 bg-sage-50 blob -z-10" />
-              {/* Photo placeholder */}
-              <div className="aspect-[3/4] bg-gradient-to-br from-sage-100 to-sage-200 rounded-[2.5rem] overflow-hidden relative">
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-sage-400">
-                  <Leaf size={48} strokeWidth={1} />
-                  <p className="text-sm mt-3 text-center px-8 text-sage-400/70">
-                    Adicione sua foto no admin<br />ou substitua este placeholder
-                  </p>
-                </div>
+              {/* Foto da Martha */}
+              <div className="aspect-[3/4] rounded-[2.5rem] overflow-hidden relative shadow-2xl shadow-sage-900/20">
+                <Image
+                  src="/martha-foto.jpg"
+                  alt="Martha Angelo — Terapeuta Integrativa"
+                  fill
+                  className="object-cover object-top"
+                  priority
+                />
               </div>
               {/* Badge */}
               <div className="absolute -bottom-5 -right-5 bg-white rounded-2xl shadow-xl shadow-sage-500/10 px-6 py-4 border border-sage-100">
