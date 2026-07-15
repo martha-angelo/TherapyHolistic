@@ -502,14 +502,18 @@ export default async function HomePage() {
                 </a>
               </RevealOnScroll>
 
-              {/* Visual */}
-              <RevealOnScroll delay={200} className="hidden lg:flex items-center justify-center p-16 relative">
-                <div className="w-48 h-64 bg-white/15 rounded-2xl border border-white/30 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center shadow-2xl rotate-3 animate-float">
-                  <Leaf size={40} className="text-white/60 mb-4" strokeWidth={1} />
-                  <p className="font-serif text-white text-lg font-medium leading-snug">
-                    Conhecendo o Meu Eu Interior
-                  </p>
-                  <p className="text-white/50 text-xs mt-3">Martha Angelo</p>
+              {/* Capa do livro */}
+              <RevealOnScroll delay={200} className="hidden lg:flex items-center justify-center p-12 relative">
+                <div className="relative w-52 animate-float drop-shadow-2xl">
+                  {/* Sombra decorativa */}
+                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-6 bg-black/25 blur-xl rounded-full" />
+                  <Image
+                    src="https://hotmart.s3.amazonaws.com/product_pictures/83b6b68e-00e0-4326-ba65-58234f9dec16/cd0fe37a5b15498a9804c58a7b840cee.jpg"
+                    alt="Conhecendo o Meu Eu Interior — ebook Martha Angelo"
+                    width={208}
+                    height={294}
+                    className="w-full rounded-2xl rotate-3 shadow-2xl"
+                  />
                 </div>
               </RevealOnScroll>
             </div>
