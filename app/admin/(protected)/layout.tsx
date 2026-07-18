@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Leaf, LayoutDashboard, FileText, Calendar, Users } from 'lucide-react'
+import { Leaf, LayoutDashboard, FileText, Calendar, Users, Package } from 'lucide-react'
 import SignOutButton from '@/components/admin/SignOutButton'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -28,6 +28,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             { href: '/admin/posts', label: 'Posts', icon: <FileText size={16} /> },
             { href: '/admin/agenda', label: 'Agenda', icon: <Calendar size={16} /> },
             { href: '/admin/pacientes', label: 'Pacientes', icon: <Users size={16} /> },
+            { href: '/admin/produtos', label: 'Produtos', icon: <Package size={16} /> },
           ].map(item => (
             <Link
               key={item.href}

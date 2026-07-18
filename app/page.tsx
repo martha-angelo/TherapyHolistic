@@ -7,15 +7,16 @@ import RevealOnScroll from '@/components/RevealOnScroll'
 import Butterfly from '@/components/Butterfly'
 
 async function getData() {
-  const [testimonials, posts] = await Promise.all([
+  const [testimonials, posts, products] = await Promise.all([
     prisma.testimonial.findMany({ where: { active: true }, take: 4 }),
     prisma.post.findMany({ where: { published: true }, orderBy: { createdAt: 'desc' }, take: 3 }),
+    prisma.product.findMany({ where: { active: true }, orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }] }),
   ])
-  return { testimonials, posts }
+  return { testimonials, posts, products }
 }
 
 export default async function HomePage() {
-  const { testimonials, posts } = await getData()
+  const { testimonials, posts, products } = await getData()
 
   return (
     <>
@@ -474,52 +475,111 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ──────────── EBOOK ──────────── */}
+      {/* ──────────── PRODUTOS / EBOOK ──────────── */}
+      {products.length > 0 && (
       <section className="py-28 bg-terra-50">
         <div className="max-w-6xl mx-auto px-5">
-          <div className="bg-gradient-to-br from-terra-400 to-terra-500 rounded-[2.5rem] overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-              {/* Text */}
-              <RevealOnScroll className="p-12 lg:p-16 flex flex-col justify-center">
-                <span className="inline-block text-white/60 text-xs font-medium tracking-widest uppercase mb-4">Ebook Digital</span>
-                <h2 className="font-serif text-3xl md:text-4xl font-medium text-white leading-tight mb-5">
-                  Conhecendo o Meu<br />
-                  <em className="italic">Eu Interior</em>
-                </h2>
-                <p className="text-white/75 leading-relaxed mb-8 font-light">
-                  Um guia rápido para recomeçar com força e clareza. Para quem sente que precisa mudar,
-                  mas não sabe por onde começar.
-                </p>
-                <a
-                  href="https://hotmart.com/pt-br/marketplace/produtos/conhecendo-o-meu-eu-interior-um-guia-rapido-para-recomecar-com-forca-e-clareza/T104825108D"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-7 py-4 bg-white text-terra-500 rounded-full font-medium text-sm hover:bg-cream-100 transition-all hover:-translate-y-0.5 duration-300 self-start"
-                >
-                  <BookOpen size={16} />
-                  Quero o ebook
-                  <ArrowRight size={16} />
-                </a>
-              </RevealOnScroll>
-
-              {/* Capa do livro */}
-              <RevealOnScroll delay={200} className="hidden lg:flex items-center justify-center p-12 relative">
-                <div className="relative w-52 animate-float drop-shadow-2xl">
-                  {/* Sombra decorativa */}
-                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-6 bg-black/25 blur-xl rounded-full" />
-                  <Image
-                    src="https://hotmart.s3.amazonaws.com/product_pictures/83b6b68e-00e0-4326-ba65-58234f9dec16/cd0fe37a5b15498a9804c58a7b840cee.jpg"
-                    alt="Conhecendo o Meu Eu Interior — ebook Martha Angelo"
-                    width={208}
-                    height={294}
-                    className="w-full rounded-2xl rotate-3 shadow-2xl"
-                  />
-                </div>
-              </RevealOnScroll>
+          {products.length === 1 ? (
+            /* Layout de destaque para 1 produto */
+            <div className="bg-gradient-to-br from-terra-400 to-terra-500 rounded-[2.5rem] overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+                <RevealOnScroll className="p-12 lg:p-16 flex flex-col justify-center">
+                  <span className="inline-block text-white/60 text-xs font-medium tracking-widest uppercase mb-4">
+                    {products[0].type === 'ebook' ? 'Ebook Digital' : products[0].type === 'curso' ? 'Curso' : products[0].type === 'mentoria' ? 'Mentoria' : 'Produto'}
+                  </span>
+                  <h2 className="font-serif text-3xl md:text-4xl font-medium text-white leading-tight mb-5">
+                    {products[0].title}
+                  </h2>
+                  {products[0].subtitle && (
+                    <p className="text-white/60 text-sm mb-3 italic">{products[0].subtitle}</p>
+                  )}
+                  <p className="text-white/75 leading-relaxed mb-8 font-light">{products[0].description}</p>
+                  <a
+                    href={products[0].linkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-7 py-4 bg-white text-terra-500 rounded-full font-medium text-sm hover:bg-cream-100 transition-all hover:-translate-y-0.5 duration-300 self-start"
+                  >
+                    <BookOpen size={16} />
+                    {products[0].price ? `Quero por R$ ${products[0].price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Conhecer o produto'}
+                    <ArrowRight size={16} />
+                  </a>
+                </RevealOnScroll>
+                <RevealOnScroll delay={200} className="hidden lg:flex items-center justify-center p-12 relative">
+                  <div className="relative w-52 animate-float drop-shadow-2xl">
+                    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-6 bg-black/25 blur-xl rounded-full" />
+                    {products[0].imageUrl ? (
+                      <Image
+                        src={products[0].imageUrl}
+                        alt={products[0].title}
+                        width={208}
+                        height={294}
+                        className="w-full rounded-2xl rotate-3 shadow-2xl"
+                      />
+                    ) : (
+                      <div className="w-52 h-72 bg-white/20 rounded-2xl rotate-3 flex items-center justify-center">
+                        <BookOpen size={48} className="text-white/50" />
+                      </div>
+                    )}
+                  </div>
+                </RevealOnScroll>
+              </div>
             </div>
-          </div>
+          ) : (
+            /* Grid para múltiplos produtos */
+            <>
+              <RevealOnScroll className="text-center mb-14">
+                <span className="section-label">Meus produtos</span>
+                <h2 className="section-title">Para a sua jornada</h2>
+              </RevealOnScroll>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {products.map((p, i) => (
+                  <RevealOnScroll key={p.id} delay={i * 100}>
+                    <a
+                      href={p.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group bg-white rounded-3xl border border-sage-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                    >
+                      <div className="h-52 bg-gradient-to-br from-terra-50 to-terra-100 relative overflow-hidden">
+                        {p.imageUrl ? (
+                          <Image src={p.imageUrl} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <BookOpen size={40} className="text-terra-300" strokeWidth={1} />
+                          </div>
+                        )}
+                        {p.featured && (
+                          <div className="absolute top-3 right-3 bg-terra-400 text-white text-xs px-3 py-1 rounded-full font-medium">
+                            Destaque
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-6 flex flex-col flex-1">
+                        <span className="text-terra-400 text-xs font-medium uppercase tracking-widest mb-2">{p.type}</span>
+                        <h3 className="font-serif text-xl font-medium text-sage-700 mb-2 leading-snug">{p.title}</h3>
+                        {p.subtitle && <p className="text-stone-400 text-sm mb-3 italic">{p.subtitle}</p>}
+                        <p className="text-stone-500 text-sm leading-relaxed flex-1 line-clamp-3">{p.description}</p>
+                        <div className="flex items-center justify-between mt-5 pt-4 border-t border-sage-50">
+                          {p.price ? (
+                            <span className="font-serif text-xl font-medium text-sage-600">
+                              R$ {p.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
+                          ) : <span />}
+                          <span className="text-sm text-terra-400 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                            Ver produto <ArrowRight size={14} />
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  </RevealOnScroll>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </section>
+      )}
 
       {/* ──────────── CTA FINAL ──────────── */}
       <section className="py-28 bg-cream-100">

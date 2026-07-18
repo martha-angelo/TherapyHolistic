@@ -1,11 +1,18 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile } from 'fs/promises'
-import { join } from 'path'
+import { put } from '@vercel/blob'
 
 export async function POST(req: NextRequest) {
   try {
+    // Requer BLOB_READ_WRITE_TOKEN no painel Vercel → Storage → Blob
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json(
+        { error: 'Upload não configurado. Use a opção "Usar URL" para inserir imagens.' },
+        { status: 503 }
+      )
+    }
+
     const formData = await req.formData()
     const file = formData.get('file') as File
 
@@ -13,30 +20,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 })
     }
 
-    // Validate type
     if (!file.type.startsWith('image/')) {
       return NextResponse.json({ error: 'Apenas imagens são permitidas' }, { status: 400 })
     }
 
-    // Validate size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json({ error: 'Imagem muito grande (máx. 5MB)' }, { status: 400 })
     }
 
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
+    const ext = file.name.split('.').pop() || 'jpg'
+    const filename = `posts/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
-    // Unique filename
-    const ext = file.name.split('.').pop()
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const uploadDir = join(process.cwd(), 'public', 'uploads')
-    const filepath = join(uploadDir, filename)
+    const blob = await put(filename, file, { access: 'public' })
 
-    await writeFile(filepath, buffer)
-
-    return NextResponse.json({ url: `/uploads/${filename}` })
+    return NextResponse.json({ url: blob.url })
   } catch (e) {
-    console.error(e)
+    console.error('Upload error:', e)
     return NextResponse.json({ error: 'Erro ao fazer upload' }, { status: 500 })
   }
 }

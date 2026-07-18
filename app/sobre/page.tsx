@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Leaf, Heart, BookOpen, CheckCircle2 } from 'lucide-react'
 import RevealOnScroll from '@/components/RevealOnScroll'
@@ -30,11 +31,14 @@ export default function SobrePage() {
       <section className="py-24 bg-cream-100">
         <div className="max-w-6xl mx-auto px-5 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <RevealOnScroll>
-            <div className="aspect-square bg-gradient-to-br from-sage-100 to-sage-200 rounded-[2.5rem] flex items-center justify-center relative">
-              <div className="text-center text-sage-400">
-                <Leaf size={64} strokeWidth={1} />
-                <p className="text-sm mt-4 text-sage-400/70 px-12">Sua foto aqui — adicione via painel admin</p>
-              </div>
+            <div className="aspect-square rounded-[2.5rem] overflow-hidden relative shadow-2xl shadow-sage-900/15">
+              <Image
+                src="/martha-foto.jpg"
+                alt="Martha Angelo — Terapeuta Integrativa"
+                fill
+                className="object-cover object-top"
+                priority
+              />
               <div className="absolute -bottom-4 -right-4 bg-white rounded-2xl shadow-lg px-5 py-3 border border-sage-100">
                 <p className="font-serif text-lg font-medium text-sage-700">Martha Angelo</p>
                 <p className="text-xs text-stone-500">Terapeuta Integrativa</p>

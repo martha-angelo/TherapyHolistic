@@ -2,17 +2,21 @@
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
-import { Upload, X, Loader2, Link } from 'lucide-react'
+import { Upload, X, Loader2, Link as LinkIcon } from 'lucide-react'
 
 interface Props {
   value: string
   onChange: (url: string) => void
+  label?: string
 }
 
-export default function ImageUpload({ value, onChange }: Props) {
+export default function ImageUpload({ value, onChange, label = 'Imagem' }: Props) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
-  const [urlMode, setUrlMode] = useState(false)
+  // URL mode é o padrão — upload direto não funciona no Vercel (filesystem read-only)
+  // Quando BLOB_READ_WRITE_TOKEN estiver configurado, o upload volta a funcionar
+  const blobConfigured = false // mude para true após configurar Vercel Blob
+  const [urlMode, setUrlMode] = useState(!blobConfigured)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleFile = async (file: File) => {
@@ -23,7 +27,7 @@ export default function ImageUpload({ value, onChange }: Props) {
     try {
       const res = await fetch('/api/upload', { method: 'POST', body: form })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
+      if (!res.ok) throw new Error(data.error || 'Erro no upload')
       onChange(data.url)
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Erro no upload')
@@ -40,26 +44,45 @@ export default function ImageUpload({ value, onChange }: Props) {
 
   return (
     <div>
-      <div className="flex items-center gap-2 mb-2">
-        <label className="block text-sm font-medium text-stone-600">Imagem do post</label>
-        <button
-          type="button"
-          onClick={() => setUrlMode(!urlMode)}
-          className="text-xs text-sage-500 hover:text-sage-700 flex items-center gap-1 transition-colors"
-        >
-          <Link size={11} />
-          {urlMode ? 'Fazer upload' : 'Usar URL'}
-        </button>
+      <div className="flex items-center justify-between mb-2">
+        <label className="block text-sm font-medium text-stone-600">{label}</label>
+        {blobConfigured && (
+          <button
+            type="button"
+            onClick={() => setUrlMode(!urlMode)}
+            className="text-xs text-sage-500 hover:text-sage-700 flex items-center gap-1 transition-colors"
+          >
+            <LinkIcon size={11} />
+            {urlMode ? 'Fazer upload' : 'Usar URL'}
+          </button>
+        )}
       </div>
 
       {urlMode ? (
-        <input
-          type="url"
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          placeholder="https://exemplo.com/imagem.jpg"
-          className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sage-400 transition-colors"
-        />
+        <div>
+          <input
+            type="url"
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            placeholder="https://hotmart.s3.amazonaws.com/... ou qualquer URL de imagem"
+            className="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sage-400 transition-colors"
+          />
+          <p className="text-xs text-stone-400 mt-1.5">
+            Cole a URL de uma imagem (do Hotmart, Unsplash, etc.)
+          </p>
+          {value && (
+            <div className="mt-3 relative aspect-video rounded-xl overflow-hidden border border-stone-100 max-w-sm">
+              <Image src={value} alt="Preview" fill className="object-cover" />
+              <button
+                type="button"
+                onClick={() => onChange('')}
+                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
+        </div>
       ) : (
         <div
           onDrop={handleDrop}
@@ -68,12 +91,7 @@ export default function ImageUpload({ value, onChange }: Props) {
         >
           {value ? (
             <div className="relative aspect-video">
-              <Image
-                src={value}
-                alt="Preview"
-                fill
-                className="object-cover"
-              />
+              <Image src={value} alt="Preview" fill className="object-cover" />
               <button
                 type="button"
                 onClick={() => onChange('')}
