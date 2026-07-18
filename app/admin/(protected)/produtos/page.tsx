@@ -17,9 +17,9 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
 }
 
 export default async function ProdutosAdminPage() {
-  const products = await prisma.product.findMany({
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-  })
+  const products = await prisma.product
+    .findMany({ orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }] })
+    .catch(() => [])
 
   return (
     <div className="p-8">

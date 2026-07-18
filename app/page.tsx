@@ -7,11 +7,14 @@ import RevealOnScroll from '@/components/RevealOnScroll'
 import Butterfly from '@/components/Butterfly'
 
 async function getData() {
-  const [testimonials, posts, products] = await Promise.all([
+  const [testimonials, posts] = await Promise.all([
     prisma.testimonial.findMany({ where: { active: true }, take: 4 }),
     prisma.post.findMany({ where: { published: true }, orderBy: { createdAt: 'desc' }, take: 3 }),
-    prisma.product.findMany({ where: { active: true }, orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }] }),
   ])
+  // Resiliente: se a tabela Product ainda não foi migrada, retorna []
+  const products = await prisma.product
+    .findMany({ where: { active: true }, orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }] })
+    .catch(() => [])
   return { testimonials, posts, products }
 }
 
