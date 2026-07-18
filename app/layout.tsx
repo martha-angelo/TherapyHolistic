@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import SiteShell from '@/components/SiteShell'
 
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR">
       <body>
         <SiteShell>{children}</SiteShell>
+        <Analytics />
       </body>
     </html>
   )
