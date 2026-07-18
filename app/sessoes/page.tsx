@@ -188,52 +188,61 @@ export default function SessoesPage() {
 
             {/* Mensal */}
             <RevealOnScroll delay={350}>
-              <div className="bg-sage-800 rounded-3xl p-10 flex flex-col shadow-xl shadow-sage-800/20 hover:-translate-y-1 transition-all duration-500 relative">
-                <div className="absolute top-6 right-6 bg-sage-300/20 text-sage-200 text-xs px-3 py-1 rounded-full font-medium border border-sage-300/30">
-                  Melhor valor
-                </div>
+              <div className="bg-sage-700 rounded-3xl p-10 flex flex-col shadow-xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden">
+                {/* Gradiente de fundo decorativo */}
+                <div className="absolute inset-0 bg-gradient-to-br from-sage-600 to-sage-700 pointer-events-none" />
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-terra-400/20 rounded-full blur-2xl pointer-events-none" />
 
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-14 h-14 bg-sage-700 rounded-2xl flex items-center justify-center text-cream-100">
-                    <Star size={26} strokeWidth={1.5} />
+                <div className="relative">
+                  <div className="absolute top-0 right-0 bg-terra-400 text-white text-xs px-3 py-1 rounded-full font-medium">
+                    Melhor valor
                   </div>
-                  <div>
-                    <h2 className="font-serif text-xl font-medium text-cream-100">Jornada Mensal</h2>
-                    <p className="text-cream-200/50 text-xs">4 sessões por mês</p>
+
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-cream-100">
+                      <Star size={26} strokeWidth={1.5} />
+                    </div>
+                    <div>
+                      <h2 className="font-serif text-xl font-medium text-cream-100">Jornada Mensal</h2>
+                      <p className="text-cream-200 text-xs opacity-60">4 sessões por mês</p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="mb-8">
-                  <div className="flex items-baseline gap-1">
-                    <span className="font-serif text-5xl font-medium text-cream-100">R$ 1.000</span>
+                  <div className="mb-8">
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-serif text-5xl font-medium text-cream-100">R$ 1.000</span>
+                    </div>
+                    <p className="text-cream-200 text-sm mt-1 opacity-60">por mês · equivale a R$ 250/sessão</p>
                   </div>
-                  <p className="text-cream-200/50 text-sm mt-1">por mês · equivale a R$ 250/sessão</p>
+
+                  <p className="text-cream-100 text-sm leading-relaxed mb-8 flex-1 opacity-80">
+                    A regularidade é o que cria transformação real e duradoura. Quatro encontros mensais com acompanhamento contínuo — para quem está pronta para uma mudança profunda na forma como se relaciona consigo mesma e com a vida.
+                  </p>
+
+                  <ul className="space-y-3 mb-10 text-sm text-cream-100 opacity-80">
+                    {[
+                      '4 sessões individuais por mês',
+                      'Acompanhamento terapêutico contínuo',
+                      'Suporte entre sessões via WhatsApp',
+                      'Plano personalizado de trabalho',
+                      'Prioridade de agendamento',
+                      'Material de apoio após cada sessão',
+                    ].map(item => (
+                      <li key={item} className="flex items-center gap-2.5">
+                        <CheckCircle2 size={14} className="text-terra-300 flex-shrink-0" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link
+                    href="/agendar?tipo=monthly"
+                    className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white text-sage-700 rounded-full font-medium text-sm hover:bg-cream-100 transition-all hover:-translate-y-0.5 duration-300"
+                  >
+                    Quero a Jornada Mensal
+                    <ArrowRight size={16} />
+                  </Link>
                 </div>
-
-                <p className="text-cream-200/70 text-sm leading-relaxed mb-8 flex-1">
-                  A regularidade é o que cria transformação real e duradoura. Quatro encontros mensais com acompanhamento contínuo — para quem está pronta para uma mudança profunda na forma como se relaciona consigo mesma e com a vida.
-                </p>
-
-                <ul className="space-y-3 mb-10 text-sm text-cream-200/70">
-                  {[
-                    '4 sessões individuais por mês',
-                    'Acompanhamento terapêutico contínuo',
-                    'Suporte entre sessões via WhatsApp',
-                    'Plano personalizado de trabalho',
-                    'Prioridade de agendamento',
-                    'Material de apoio após cada sessão',
-                  ].map(item => (
-                    <li key={item} className="flex items-center gap-2.5">
-                      <CheckCircle2 size={14} className="text-sage-300 flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link href="/agendar?tipo=monthly" className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-sage-300/20 border border-sage-300/40 text-cream-100 rounded-full font-medium text-sm hover:bg-sage-300/30 transition-all hover:-translate-y-0.5 duration-300">
-                  Quero a Jornada Mensal
-                  <ArrowRight size={16} />
-                </Link>
               </div>
             </RevealOnScroll>
 

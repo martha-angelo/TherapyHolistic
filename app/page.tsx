@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, Star, Leaf, Heart, Wind, Sparkles, BookOpen, CheckCircle2, ChevronRight } from 'lucide-react'
